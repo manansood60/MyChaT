@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -25,6 +27,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText mPasswordText;
     private Button mSignUp;
 
+    private DatabaseReference mDBRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -43,14 +46,15 @@ public class SignupActivity extends AppCompatActivity {
         mSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String name = mNameText.getText().toString();
                 String email = mEmailText.getText().toString();
                 String password = mPasswordText.getText().toString();
-                signUp(email,password);
+                signUp(name,email,password);
             }
         });
     }
 
-    private void signUp(String email, String password){
+    private void signUp(String name,String email, String password){
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -61,6 +65,7 @@ public class SignupActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(SignupActivity.this, user.getEmail() +" User Created.",
                                     Toast.LENGTH_SHORT).show();
+                            addUserToDatabase(name, email, mAuth.getCurrentUser().getUid());
                             Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                             startActivity(intent);
 
@@ -76,5 +81,10 @@ public class SignupActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+    private void addUserToDatabase(String name, String email, String uid){
+        Log.e(LOG_TAG,"Adding data");
+        mDBRef = FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
+        mDBRef.child("users").child(uid).setValue(new User(name,email,uid));
     }
 }

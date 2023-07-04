@@ -15,5 +15,8 @@
 local.properties
 
 
-app/src/main/res/layout/users_layout.xml
+app/src/main/java/com/example/mychat/UserAdapter.java
+
+
+
 
