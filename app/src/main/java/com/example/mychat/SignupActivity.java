@@ -66,7 +66,7 @@ public class SignupActivity extends AppCompatActivity {
                             Toast.makeText(SignupActivity.this, user.getEmail() +" User Created.",
                                     Toast.LENGTH_SHORT).show();
                             addUserToDatabase(name, email, mAuth.getCurrentUser().getUid());
-                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                            Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                             startActivity(intent);
 
                             //updateUI(user);
