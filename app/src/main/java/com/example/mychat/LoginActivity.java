@@ -38,6 +38,19 @@ public class LoginActivity extends AppCompatActivity {
         mLogin = findViewById(R.id.login_btn);
         mSignUp = findViewById(R.id.signup_btn);
 
+
+        // Restoring the user after minimize without logout
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+        } else {
+            // User is signed out
+            Log.d(LOG_TAG, "onAuthStateChanged:signed_out");
+        }
+
         mSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
 
-                        // ...
                     }
                 });
     }
