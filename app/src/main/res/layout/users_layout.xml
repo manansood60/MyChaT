@@ -5,25 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/user_name"
+    <RelativeLayout
+        android:id="@+id/user_view"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        tools:text="Manan"
-        android:textStyle="bold"
-        android:gravity="center_vertical"
-        android:paddingLeft="10dp"
-        android:textSize="24sp"
+        android:layout_height="56dp"
+        >
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/avatar"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            />
 
-         />
-    <TextView
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            tools:text="Manan"
+            android:textStyle="bold"
+            android:textColor="@color/app_grey"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:layout_toRightOf="@id/user_image"
+
+            />
+
+
+    </RelativeLayout>
+
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        tools:text="Manan"
-        android:gravity="center_vertical"
-        android:paddingLeft="10dp"
-        android:textSize="24sp"
-        android:background="@color/black"
-        android:layout_below="@id/user_name"
+        android:background="#e6e6e6"
+        android:layout_below="@id/user_view"
         />
 </RelativeLayout>
