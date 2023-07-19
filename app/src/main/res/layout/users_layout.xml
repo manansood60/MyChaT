@@ -7,15 +7,17 @@
 
     <RelativeLayout
         android:id="@+id/user_view"
+        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         >
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_image"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/avatar"
-            android:layout_marginLeft="8dp"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             />
@@ -23,16 +25,35 @@
         <TextView
             android:id="@+id/user_name"
             android:layout_width="wrap_content"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             tools:text="Manan"
             android:textStyle="bold"
             android:textColor="@color/app_grey"
-            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
             android:paddingLeft="10dp"
             android:textSize="20sp"
             android:layout_toRightOf="@id/user_image"
-
             />
+        <TextView
+            android:id="@+id/last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap to chat"
+            android:paddingLeft="10dp"
+            android:textSize="12sp"
+            android:layout_toRightOf="@id/user_image"
+            android:layout_below="@id/user_name"
+            />
+        <TextView
+            android:id="@+id/last_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="06:00 PM"
+            android:textSize="12sp"
+            android:layout_alignParentEnd="true"
+            />
+
 
 
     </RelativeLayout>

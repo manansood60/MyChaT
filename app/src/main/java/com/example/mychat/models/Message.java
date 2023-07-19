@@ -5,6 +5,7 @@ public class Message {
     private String message;
     private String senderId;
     private String messageId;
+    private String imageUrl;
     private int feeling = -1;  // setting default value to no feeling.
     private long time;
 
@@ -53,5 +54,13 @@ public class Message {
     }
     public String getSenderId(){
         return senderId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

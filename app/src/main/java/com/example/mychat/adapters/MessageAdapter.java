@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.mychat.models.Message;
 import com.example.mychat.R;
 import com.github.pgreze.reactions.Reaction;
@@ -63,6 +64,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(holder.getClass() == SentViewHolder.class){
             // logic for binding data to sent message layout
             SentViewHolder viewHolder = (SentViewHolder)holder;
+            if(message.getImageUrl() != null){
+                viewHolder.sentMessage.setVisibility(View.GONE);
+                Glide.with(parentContext)
+                        .load(message.getImageUrl())
+                        .placeholder(R.drawable.placeholder)
+                        .into(viewHolder.sentMessageImage);
+                viewHolder.sentMessageImage.setVisibility(View.VISIBLE);
+            }
             // setting the message to textview
             viewHolder.sentMessage.setText(message.getMessage());
             // if there is a reaction with the message then set it.
@@ -71,7 +80,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 viewHolder.sentMessageFeeling.setVisibility(View.VISIBLE);
             }
             // setting onTouch listener to open reactions on touching message
-            viewHolder.sentMessage.setOnTouchListener(new View.OnTouchListener() {
+            viewHolder.sentMessageLayout.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     popup.onTouch(view, motionEvent);
@@ -83,6 +92,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             // logic for data binding to received message layout
             ReceivedViewHolder viewHolder = (ReceivedViewHolder) holder;
             // setting the message to textview
+            if(message.getImageUrl() != null){
+                viewHolder.receivedMessage.setVisibility(View.GONE);
+                Glide.with(parentContext)
+                        .load(message.getImageUrl())
+                        .placeholder(R.drawable.placeholder)
+                        .into(viewHolder.receivedMessageImage);
+                viewHolder.receivedMessageImage.setVisibility(View.VISIBLE);
+            }
             viewHolder.receivedMessage.setText(message.getMessage());
             // if there is a reaction with the message then set it.
             if(message.getFeeling() >= 0){
@@ -90,7 +107,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 viewHolder.receivedMessageReaction.setVisibility(View.VISIBLE);
             }
             // setting onTouch listener to open reactions on touching message
-            viewHolder.receivedMessage.setOnTouchListener(new View.OnTouchListener() {
+            viewHolder.receivedMessageLayout.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     popup.onTouch(view, motionEvent);
@@ -122,20 +139,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public static class SentViewHolder extends RecyclerView.ViewHolder{
         ImageView sentMessageFeeling;
+        ImageView sentMessageImage;
         TextView sentMessage;
+        View sentMessageLayout;
         public SentViewHolder(View itemView) {
             super(itemView);
             sentMessage = itemView.findViewById(R.id.sent_message_text);
             sentMessageFeeling = itemView.findViewById(R.id.sent_message_feeling);
+            sentMessageImage = itemView.findViewById(R.id.sent_message_image);
+            sentMessageLayout = itemView.findViewById(R.id.sent_message_linearlayout);
         }
     }
     public static class ReceivedViewHolder extends RecyclerView.ViewHolder{
+        ImageView receivedMessageImage;
         TextView receivedMessage;
         ImageView receivedMessageReaction;
+        View receivedMessageLayout;
         public ReceivedViewHolder(View itemView) {
             super(itemView);
             receivedMessage = itemView.findViewById(R.id.received_message_text);
             receivedMessageReaction = itemView.findViewById(R.id.received_message_feeling);
+            receivedMessageImage = itemView.findViewById(R.id.received_message_image);
+            receivedMessageLayout = itemView.findViewById(R.id.received_message_linearlayout);
         }
     }
     // This method handles all the code of Related to Reactions

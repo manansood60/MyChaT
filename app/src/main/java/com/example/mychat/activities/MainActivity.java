@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.mychat.R;
 import com.example.mychat.models.User;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 mAdapter.notifyDataSetChanged();
+                findViewById(R.id.users_progress_bar).setVisibility(View.GONE);
             }
 
             @Override
