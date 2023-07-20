@@ -68,6 +68,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Setting the user status online on loading the activity
+    @Override
+    protected void onResume() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference().child("presence").child(userId).setValue("Online");
+        super.onResume();
+    }
+    // Setting the user status offline when user leaves the activity
+    @Override
+    protected void onPause() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference().child("presence").child(userId).setValue("Offline");
+        super.onPause();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

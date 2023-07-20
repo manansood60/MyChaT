@@ -5,6 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ChatActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/chat_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="?attr/actionBarTheme"
+        android:background="?attr/colorPrimary"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:id="@+id/chat_toolbar_back"
+                android:layout_marginTop="10dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/back_arrow"
+                />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/chat_toolbar_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="6dp"
+                android:layout_toRightOf="@id/chat_toolbar_back"
+                android:src="@drawable/avatar"/>
+            <TextView
+                android:id="@+id/chat_toolbar_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Manan"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:layout_marginLeft="12dp"
+                android:textStyle="bold"
+                android:layout_toRightOf="@id/chat_toolbar_image"
+
+                />
+            <TextView
+                android:id="@+id/chat_toolbar_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="Offline"
+                android:textColor="@color/white"
+                android:layout_toRightOf="@id/chat_toolbar_image"
+                android:layout_below="@id/chat_toolbar_name"
+                />
+
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
 
     <ProgressBar
         android:id="@+id/chat_progress_bar"
@@ -15,7 +66,7 @@
         android:indeterminate="true" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/chat_toolbar"
         android:layout_above="@id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

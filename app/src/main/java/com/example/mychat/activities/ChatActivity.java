@@ -8,12 +8,17 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.mychat.models.Message;
 import com.example.mychat.adapters.MessageAdapter;
 import com.example.mychat.R;
@@ -59,8 +64,13 @@ public class ChatActivity extends AppCompatActivity {
 
         String name = getIntent().getStringExtra("name");
         String receiverUid = getIntent().getStringExtra("uid");
-        getSupportActionBar().setTitle(name);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        String profilePicture = getIntent().getStringExtra("image");
+        // setting up our custome toolbar as actionbar for activity
+        setSupportActionBar(findViewById(R.id.chat_toolbar));
+        TextView userName = findViewById(R.id.chat_toolbar_name);
+        ImageView userImage = findViewById(R.id.chat_toolbar_image);
+        userName.setText(name);
+        Glide.with(ChatActivity.this).load(profilePicture).placeholder(R.drawable.avatar).into(userImage);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Sending image...");
@@ -79,6 +89,23 @@ public class ChatActivity extends AppCompatActivity {
         messageAdapter = new MessageAdapter(messageList, this, senderRoom, receiverRoom);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         chatRecyclerView.setAdapter(messageAdapter);
+
+        // Displaying the status of receiving user in toolbar
+        mDBRef.child("presence").child(receiverUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    String status = snapshot.getValue(String.class);
+                    TextView userStatus = findViewById(R.id.chat_toolbar_status);
+                    userStatus.setText(status);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
 
         // Displaying Messages by fetching them from Database
         mDBRef.child("chats").child(senderRoom).child("messages").addValueEventListener(new ValueEventListener() {
@@ -144,6 +171,33 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
+        // setting listener on message box to change the user status to typing when typing.
+        final Handler handler = new Handler();
+        messageBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mDBRef.child("presence").child(senderUid).setValue("Typing...");
+                handler.removeCallbacksAndMessages(null);
+                handler.postDelayed(userStoppedTyping, 1000);
+            }
+            Runnable userStoppedTyping = new Runnable() {
+                @Override
+                public void run() {
+                    mDBRef.child("presence").child(senderUid).setValue("Online");
+                }
+            };
+        });
+
 
     }
 
@@ -200,6 +254,22 @@ public class ChatActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
+    }
+    // Setting the user status online on loading the activity
+    @Override
+    protected void onResume() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference().child("presence").child(userId).setValue("Online");
+        super.onResume();
+    }
+    // Setting the user status offline when user leaves the activity
+    @Override
+    protected void onPause() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference().child("presence").child(userId).setValue("Offline");
+        super.onPause();
     }
 
 }
