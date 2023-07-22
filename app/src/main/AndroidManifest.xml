@@ -4,15 +4,21 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logo"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyChat">
-        <activity android:name=".activities.ChatActivity"
-            android:theme="@style/Theme.MyChat.NoActionBar"
-            ></activity>
         <activity android:name=".activities.SignupActivity" />
-        <activity android:name=".activities.MainActivity" />
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:theme="@style/Theme.MyChat.NoActionBar"></activity>
+        <activity
+            android:name=".activities.ChatActivity"
+            android:theme="@style/Theme.MyChat.NoActionBar" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:theme="@style/Theme.MyChat.NoActionBar" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

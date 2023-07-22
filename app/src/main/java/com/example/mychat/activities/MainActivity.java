@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setSupportActionBar(findViewById(R.id.main_toolbar));
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -79,9 +81,11 @@ public class MainActivity extends AppCompatActivity {
     // Setting the user status offline when user leaves the activity
     @Override
     protected void onPause() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference().child("presence").child(userId).setValue("Offline");
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                    .getReference().child("presence").child(userId).setValue("Offline");
+        }
         super.onPause();
     }
 
@@ -94,9 +98,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.logout){
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                    .getReference().child("presence").child(userId).setValue("Offline");
             mAuth.signOut();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             finish();
+            startActivity(intent);
+        }else if(item.getItemId() == R.id.profile){
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

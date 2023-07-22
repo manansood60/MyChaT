@@ -1,13 +1,18 @@
 package com.example.mychat.adapters;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,9 +23,12 @@ import com.github.pgreze.reactions.Reaction;
 import com.github.pgreze.reactions.ReactionPopup;
 import com.github.pgreze.reactions.ReactionsConfig;
 import com.github.pgreze.reactions.ReactionsConfigBuilder;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -78,15 +86,43 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(message.getFeeling() >= 0){
                 viewHolder.sentMessageFeeling.setImageResource(reactions[message.getFeeling()]);
                 viewHolder.sentMessageFeeling.setVisibility(View.VISIBLE);
+            }else{
+                viewHolder.sentMessageFeeling.setVisibility(View.GONE);
             }
             // setting onTouch listener to open reactions on touching message
-            viewHolder.sentMessageLayout.setOnTouchListener(new View.OnTouchListener() {
+            GestureDetector gestureDetector = new GestureDetector(parentContext, new GestureDetector.SimpleOnGestureListener() {
                 @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    popup.onTouch(view, motionEvent);
-                    return false;
+                public void onLongPress(MotionEvent e) {
+                    // Handle long press event here (e.g., show a dialog for message deletion)
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    // Handle single tap event here (e.g., open reactions window)
+                    popup.onTouch(viewHolder.itemView, e);
+                    return true;
                 }
             });
+            if(!message.getMessage().equals("The message is deleted.")) {
+                viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                        return gestureDetector.onTouchEvent(motionEvent);
+                    }
+                });
+                // set up long click listener for message deletion
+                viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        AlertDialog deleteDialog = createDeleteDialog(message, viewHolder);
+                        deleteDialog.show();
+                        return false;
+                    }
+
+                });
+
+            }
 
         }else{
             // logic for data binding to received message layout
@@ -105,15 +141,42 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(message.getFeeling() >= 0){
                 viewHolder.receivedMessageReaction.setImageResource(reactions[message.getFeeling()]);
                 viewHolder.receivedMessageReaction.setVisibility(View.VISIBLE);
+            }else{
+                viewHolder.receivedMessageReaction.setVisibility(View.GONE);
             }
+
             // setting onTouch listener to open reactions on touching message
-            viewHolder.receivedMessageLayout.setOnTouchListener(new View.OnTouchListener() {
+            GestureDetector gestureDetector = new GestureDetector(parentContext, new GestureDetector.SimpleOnGestureListener() {
                 @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    popup.onTouch(view, motionEvent);
-                    return false;
+                public void onLongPress(MotionEvent e) {
+                    // Handle long press event here (e.g., show a dialog for message deletion)
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    // Handle single tap event here (e.g., open reactions window)
+                    popup.onTouch(viewHolder.itemView, e);
+                    return true;
                 }
             });
+            if(!message.getMessage().equals("The message is deleted.")) {
+                viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        return gestureDetector.onTouchEvent(motionEvent);
+                    }
+                });
+                // set up long click listener for message deletion
+                viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        AlertDialog deleteDialog = createDeleteDialog(message, viewHolder);
+                        deleteDialog.show();
+                        return false;
+                    }
+
+                });
+            }
         }
 
     }
@@ -181,6 +244,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         // This code will be called every time a reaction is selected.
         ReactionPopup popup = new ReactionPopup(parentContext, config, (reactionPosition) -> {
 
+
             // After the reaction has been selected we update it in the both user's database.
             message.setFeeling(reactionPosition);
             mDBRef = FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
@@ -190,6 +254,74 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return true; // true is closing popup, false is requesting a new selection
         });
         return popup;
+    }
+    // This method creates and returns message deletion dialog
+    public AlertDialog createDeleteDialog(Message message, RecyclerView.ViewHolder holder){
+        mDBRef = FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        ProgressDialog deleteDialog;          // Progress dialog to show processing animation till image is deleted.
+        deleteDialog = new ProgressDialog(parentContext);
+        deleteDialog.setMessage("Deleting image...");
+        deleteDialog.setCancelable(false);
+
+
+        // Chain together various setter methods to set the dialog characteristics
+        builder.setTitle("Delete Message");
+
+        // Adding the buttons
+        builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // User clicked Delete For Everyone button
+                message.setMessage("The message is deleted.");
+                message.setFeeling(-1);
+                // if it is image message
+                if(message.getImageUrl() != null){
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(message.getImageUrl());
+                    String imageName = storageReference.getName();
+                    StorageReference deletionReference = FirebaseStorage.getInstance().getReference().child("chats/" + imageName);
+                    Log.e("Delete " , deletionReference.toString());
+                    deleteDialog.show();
+                    deletionReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            deleteDialog.dismiss();
+                            message.setImageUrl(null);
+                            mDBRef.child("chats").child(senderRoom).child("messages").child(message.getMessageId()).setValue(message);
+                            mDBRef.child("chats").child(receiverRoom).child("messages").child(message.getMessageId()).setValue(message);
+                            if(holder.getClass() == ReceivedViewHolder.class){
+                                ReceivedViewHolder viewHolder = (ReceivedViewHolder)(holder);
+                                viewHolder.receivedMessageImage.setVisibility(View.GONE);
+                                viewHolder.receivedMessageReaction.setVisibility(View.GONE);
+                                viewHolder.receivedMessage.setVisibility(View.VISIBLE);
+                            }else{
+                                SentViewHolder viewHolder = (SentViewHolder) (holder);
+                                viewHolder.sentMessageImage.setVisibility(View.GONE);
+                                viewHolder.sentMessageFeeling.setVisibility(View.GONE);
+                                viewHolder.sentMessage.setVisibility(View.VISIBLE);
+                            }
+                            holder.itemView.setOnTouchListener(null);
+                            holder.itemView.setOnLongClickListener(null);
+                        }
+                    });
+                }
+                // if it is a text message.
+                else{
+                    mDBRef.child("chats").child(senderRoom).child("messages").child(message.getMessageId()).setValue(message);
+                    mDBRef.child("chats").child(receiverRoom).child("messages").child(message.getMessageId()).setValue(message);
+                    holder.itemView.setOnTouchListener(null);
+                    holder.itemView.setOnLongClickListener(null);
+                }
+            }
+        });
+
+        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        return dialog;
     }
 
 

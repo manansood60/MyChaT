@@ -71,6 +71,7 @@ public class ChatActivity extends AppCompatActivity {
         ImageView userImage = findViewById(R.id.chat_toolbar_image);
         userName.setText(name);
         Glide.with(ChatActivity.this).load(profilePicture).placeholder(R.drawable.avatar).into(userImage);
+        setupBackButton();
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Sending image...");
@@ -270,6 +271,17 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance("https://my-chat-202a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference().child("presence").child(userId).setValue("Offline");
         super.onPause();
+    }
+    // This method is used to setup back button functionality to go to previous activity on click
+    private void setupBackButton(){
+        ImageView backButton = findViewById(R.id.chat_toolbar_back);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 }
