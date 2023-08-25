@@ -5,5 +5,5 @@
     android:bottomRightRadius="20dp"
     android:topLeftRadius="20dp"
     />
-    <solid android:color="@color/app_grey" />
+    <solid android:color="@color/primary_theme_color" />
 </shape>

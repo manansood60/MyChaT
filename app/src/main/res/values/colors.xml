@@ -13,4 +13,6 @@
     <color name="app_green">#c9efc7</color>
     <color name="app_grey">#5a5a5a</color>
     <color name="app_dark_grey"> #404040</color>
+    <color name="primary_theme_color">#0088cc</color>
+    <color name="primary_theme_color_dark">#005580</color>
 </resources>

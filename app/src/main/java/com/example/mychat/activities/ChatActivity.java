@@ -149,7 +149,6 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             mDBRef.child("chats").child(receiverRoom).child("messages").child(randomKey).setValue(messageObject);
-
                         }
                     });
                     messageBox.setText("");
